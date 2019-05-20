@@ -47,7 +47,7 @@ module ZipkinTracer
         span.kind = Trace::Span::Kind::CLIENT
         span.remote_endpoint = remote_endpoint
         span.record_tag(Trace::Span::Tag::METHOD, method.upcase)
-        span.record_tag(Trace::Span::Tag::PATH, url.path)
+        span.record_tag(Trace::Span::Tag::URL, url.to_s)
         response = @app.call(env).on_complete do |renv|
           span.record_status(renv[:status])
         end

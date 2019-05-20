@@ -7,10 +7,6 @@ module ZipkinTracer
   # This middleware reads Zipkin headers from the request and sets/creates a Trace.id usable by the rest of the app
   # It will also send the trace to the Zipkin service using one of the methods configured.
   class RackHandler
-    # the following constants are defined only from rack 1.6
-    PATH_INFO = Rack::PATH_INFO rescue 'PATH_INFO'.freeze
-    REQUEST_METHOD = Rack::REQUEST_METHOD rescue 'REQUEST_METHOD'.freeze
-
     def initialize(app, config = nil)
       @app = app
       @config = Config.new(app, config).freeze
@@ -33,13 +29,8 @@ module ZipkinTracer
 
     private
 
-    SERVER_RECV_TAGS = {
-      Trace::Span::Tag::PATH => PATH_INFO,
-      Trace::Span::Tag::METHOD => REQUEST_METHOD
-    }.freeze
-
     def span_name(env)
-      "#{env[REQUEST_METHOD].to_s.downcase} #{Application.route(env)}".strip
+      "#{env[Rack::REQUEST_METHOD].to_s.downcase} #{Application.route(env)}".strip
     end
 
     def annotate_plugin(span, env, status, response_headers, response_body)
@@ -50,14 +41,14 @@ module ZipkinTracer
       status, headers, body = yield
     ensure
       trace_server_information(span, zipkin_env, status)
-
       annotate_plugin(span, zipkin_env.env, status, headers, body)
     end
 
     def trace_server_information(span, zipkin_env, status)
       span.kind = Trace::Span::Kind::SERVER
       span.record_status(status)
-      SERVER_RECV_TAGS.each { |annotation_key, env_key| span.record_tag(annotation_key, zipkin_env.env[env_key]) }
+      span.record_tag(Trace::Span::Tag::URL, zipkin_env.url)
+      span.record_tag(Trace::Span::Tag::METHOD, zipkin_env.env[Rack::REQUEST_METHOD])
     end
   end
 end

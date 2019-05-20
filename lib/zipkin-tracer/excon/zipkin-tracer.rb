@@ -69,7 +69,7 @@ module ZipkinTracer
       span.kind = Trace::Span::Kind::CLIENT
       span.remote_endpoint = remote_endpoint(url, service_name)
       span.record_tag(Trace::Span::Tag::METHOD, method.upcase)
-      span.record_tag(Trace::Span::Tag::PATH, url.path)
+      span.record_tag(Trace::Span::Tag::URL, url.to_s)
 
       # store the span in the datum hash so it can be used in the response_call
       datum[:span] = span

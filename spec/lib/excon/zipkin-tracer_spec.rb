@@ -135,7 +135,7 @@ describe ZipkinTracer::ExconHandler do
           span = spy('Trace::Span')
           allow(Trace::Span).to receive(:new).and_return(span)
 
-          expect(span).to receive(:record_tag).with("http.path", "/some/path/here")
+          expect(span).to receive(:record_tag).with("http.url", url.to_s)
 
           ZipkinTracer::TraceContainer.with_trace_id(trace_id) do
             connection.request
@@ -145,9 +145,10 @@ describe ZipkinTracer::ExconHandler do
 
       context 'query params are in hash' do
         let(:url_path) { '/some/path/here' }
+        let(:whole_url) { url.to_s + "?query=params" }
 
         it 'queries without the query even when query is a hash' do
-          stub_request(:post, url.to_s + "?query=params")
+          stub_request(:post, whole_url)
             .to_return(status: 200, body: '', headers: {})
           ENV['ZIPKIN_SERVICE_NAME'] = service_name
 
@@ -161,7 +162,7 @@ describe ZipkinTracer::ExconHandler do
           span = spy('Trace::Span')
           allow(Trace::Span).to receive(:new).and_return(span)
 
-          expect(span).to receive(:record_tag).with("http.path", "/some/path/here")
+          expect(span).to receive(:record_tag).with("http.url", whole_url)
 
           ZipkinTracer::TraceContainer.with_trace_id(trace_id) do
             connection.request(path: url_path, query: { query: "params" })
@@ -221,7 +222,7 @@ describe ZipkinTracer::ExconHandler do
         stub_request(:get, url)
           .to_return(status: 200, body: '', headers: {})
 
-        expect_any_instance_of(Trace::Span).to receive(:record_tag).with('http.path', "/some/path/here")
+        expect_any_instance_of(Trace::Span).to receive(:record_tag).with('http.url', url.to_s)
         expect_any_instance_of(Trace::Span).to receive(:record_tag).with('http.status_code', '200')
         expect_any_instance_of(Trace::Span).to receive(:record_tag).with('http.method', 'GET')
 

@@ -38,7 +38,8 @@ shared_examples 'make requests' do |expect_to_trace_request|
   let(:hostname) { 'service.example.com' }
   let(:host_ip) { 0x11223344 }
   let(:url_path) { '/some/path/here' }
-  let(:raw_url) { "https://#{hostname}#{url_path}" }
+  let(:query_params) { 'param=param_value' }
+  let(:raw_url) { URI::HTTP.build(host: hostname, path: url_path, query: query_params).to_s }
   let(:tracer) { Trace.tracer }
   let(:trace_id) { ::Trace::TraceId.new(1, 2, 3, true, ::Trace::Flags::DEBUG) }
 
@@ -65,8 +66,8 @@ shared_examples 'make requests' do |expect_to_trace_request|
     end
 
     expect_any_instance_of(Trace::Span).to receive(:record_tag) do |_, key, value|
-      expect(key).to eq('http.path')
-      expect(value).to eq(url_path)
+      expect(key).to eq('http.url')
+      expect(value).to eq(raw_url)
     end
 
     expect_any_instance_of(Trace::Span).to receive(:record_tag) do |_, key, value|

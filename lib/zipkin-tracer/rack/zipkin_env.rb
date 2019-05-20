@@ -20,6 +20,10 @@ module ZipkinTracer
       @called_with_zipkin_headers ||= B3_REQUIRED_HEADERS.all? { |key| @env.key?(key) }
     end
 
+    def url
+      Rack::Request.new(env).url
+    end
+
     private
 
     B3_REQUIRED_HEADERS = %w(HTTP_X_B3_TRACEID HTTP_X_B3_SPANID).freeze

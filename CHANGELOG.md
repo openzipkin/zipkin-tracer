@@ -1,3 +1,6 @@
+# 0.37.0
+* Annotate http.url instead of http.path.
+
 # 0.36.2
 * Cleanup the gemspec. No code changes.
 

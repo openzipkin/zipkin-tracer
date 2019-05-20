@@ -4,8 +4,8 @@ module ZipkinTracer
     # Determines if our framework knows whether the request will be routed to a controller
     def self.routable_request?(env)
       return true unless defined?(Rails) # If not running on a Rails app, we can't verify if it is invalid
-      path_info = env[ZipkinTracer::RackHandler::PATH_INFO] || ""
-      http_method = env[ZipkinTracer::RackHandler::REQUEST_METHOD]
+      path_info = env[Rack::PATH_INFO] || ""
+      http_method = env[Rack::REQUEST_METHOD]
       Rails.application.routes.recognize_path(path_info, method: http_method)
       true
     rescue ActionController::RoutingError
@@ -15,8 +15,8 @@ module ZipkinTracer
     def self.route(env)
       return nil unless defined?(Rails)
       stub_env = {
-        "PATH_INFO" => env[ZipkinTracer::RackHandler::PATH_INFO],
-        "REQUEST_METHOD" => env[ZipkinTracer::RackHandler::REQUEST_METHOD]
+        "PATH_INFO" => env[Rack::PATH_INFO],
+        "REQUEST_METHOD" => env[Rack::REQUEST_METHOD]
       }
       req = Rack::Request.new(stub_env)
       # Returns a string like /some/path/:id
