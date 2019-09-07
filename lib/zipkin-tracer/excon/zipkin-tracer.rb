@@ -12,6 +12,8 @@ module ZipkinTracer
     end
 
     def request_call(datum)
+      return super(datum) if !datum[:headers][b3_headers().values.first].nil?
+
       trace_id = TraceGenerator.new.next_trace_id
 
       TraceContainer.with_trace_id(trace_id) do

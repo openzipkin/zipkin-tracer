@@ -15,6 +15,7 @@ describe ZipkinTracer::ExconHandler do
                           )
     connection.request
 
+    return headers if !headers.empty?
     request_headers = nil
     expect(a_request(:post, url).with { |req|
       # Webmock 'normalizes' the headers. E.g: X-B3-TraceId becomes X-B3-Traceid.

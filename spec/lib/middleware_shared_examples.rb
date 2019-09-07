@@ -91,6 +91,14 @@ shared_examples 'make requests' do |expect_to_trace_request|
       end
     end
 
+    it 'expects tracing once even when called twice' do
+      if expect_to_trace_request
+        expect_tracing
+        request_headers = process('', url)
+        process('', url, request_headers)
+      end
+    end
+
     it 'sets the X-B3 request headers with a new spanID' do
       request_headers  = nil
       ZipkinTracer::TraceContainer.with_trace_id(trace_id) do

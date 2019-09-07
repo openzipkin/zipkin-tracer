@@ -1,3 +1,6 @@
+# 0.39.3
+* Protect Faraday and Excon middlewares against adding them twice.
+
 # 0.39.2
 * Make Faraday 0.13 the minimum requirement.
 

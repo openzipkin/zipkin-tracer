@@ -27,7 +27,7 @@ describe ZipkinTracer::FaradayHandler do
       method: :post,
       url: url,
       body: body,
-      request_headers: {}, #Faraday::Utils::Headers.new(headers),
+      request_headers: headers, #Faraday::Utils::Headers.new(headers),
     }
     middleware.call(env).env[:request_headers]
   end

@@ -10,6 +10,8 @@ module ZipkinTracer
     end
 
     def call(env)
+      # Prevent calling this middleware twice
+      return @app.call(env) if !env[:request_headers][b3_headers().values.first].nil?
       trace_id = TraceGenerator.new.next_trace_id
       TraceContainer.with_trace_id(trace_id) do
         b3_headers.each do |method, header|
